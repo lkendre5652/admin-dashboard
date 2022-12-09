@@ -31,3 +31,4 @@
     <script src="../../view/styles/js/jquery.min.js"></script>
   </head>
   <body class="login_form_body bg-primary">
+    <span class="logoutbtn"> <a href="logout.php" class="btn btn-warning">Logout | <?php echo $_SESSION['user_name']; ?></a></span>
