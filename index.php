@@ -67,6 +67,7 @@ function getUserData($username,$password){
           </form>
           <span class="error-msg"><?php echo (!empty($comErr))? $comErr : "";?></span>          
         </div>
+        <a href="./view/forgotpassword.php">forgot password</a>
       </div>
     </div>
   </div>
