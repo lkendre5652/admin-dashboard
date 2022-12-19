@@ -5,7 +5,7 @@
 
 <?php 
 // from  email landing
-if( empty($_GET[sha1('lklink')])){
+
 
 ?>
 <?php
@@ -15,7 +15,7 @@ if(isset($_REQUEST['forgotPassSmt'])){
 	if( empty($useremail)){
 		$userErr="This field should not be blank.";
 	}else{						
-		$userErr =  getRegistEmail($useremail);		
+		$userErr = getRegistEmail($useremail);		
 	}	
 }
 function getRegistEmail($userEmail){
@@ -32,7 +32,7 @@ function getRegistEmail($userEmail){
 		$tokanQuery = "update user set  set_token = '{$token}' where role_id = '{$role_id}' AND user_name='{$user_name}' ";
 		$updateResult = mysqli_query($conn, $tokanQuery);		
 		if($updateResult == 1){	
-			$sentemailResp = sendForgorPassLink($userEmail,$user_name,$token);					
+			echo $sentemailResp = sendForgorPassLink($userEmail,$user_name,$token);					
 		}else{
 			$sendResp= "OOPS!, something went wrong with you please try again!!";	
 		}			
@@ -41,14 +41,16 @@ function getRegistEmail($userEmail){
 	}
 	return $sendResp;
 }
+
+// send pass reset link
 function sendForgorPassLink($userEmail,$user_name,$token){
 	
 	$downloadLink = sha1('lklink');
-	$dlink = "https://development.ikf.in/emp-management/admin/view/forgotpassword.php?".$downloadLink."=".$token;	
+	$dlink = "https://development.ikf.in/emp-management/admin/view/resetpassword.php?".$downloadLink."=".$token;	
 	$subject = "Forgot Password Link";
 	 $msg = "Dear ".$user_name.",<br><br> You have received below Password reset link from <strong>Laxman</strong>.<br>";             
-    $msg .= "<br>Email:".$to;    
-    $msg .= "<a href='".$dlink."' title='click here!!' target='_NEW'>Reset Password</a>";
+    $msg .= "<br>Email:".$userEmail;    
+    $msg .= "<br><a href='".$dlink."' title='click here!!' target='_NEW'>Reset Password</a>";
     $msg .= "<br><br><br>";
     $msg .= "Thanks & Regards,<br>";
     $msg .= "<strong>Laxman Kendre</strong>";
@@ -117,8 +119,36 @@ $url = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'http://' : 'https:/
   </div>
 </div>
 <?php 
-}else{  // forgot form ?>
-	
+if( empty($_GET[sha1('lklink')])){
+
+}else{  
+//forgot form
+//echo $token = $_GET[sha1('lklink')]; 
+$userErr = "";
+if(isset($_REQUEST['updateForgotPass'])){
+	$newPass = $_POST['newPass'];
+	$newPassCfrm = $_POST['newPassCfrm'];
+	if( empty($newPass)){
+		$newPassErr="This field should not be blank.";
+	}else if( !preg_match_all('$\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])(?=\S*[\W])\S*$', $newPass) ){		
+		$newPassErr= "Password must be like ex: Exampl$1";
+	}else{
+		echo $matchPass = 1 ;
+	}
+	if( empty($newPassCfrm)){
+		$newPassCfrmErr="This field should not be blank.";
+	}
+	if( empty($newPass) && empty($newPassCfrm) ){
+		$newPassCommErr="Please check your fields, It should not blank.";
+	}else if( ($newPassCfrm != $newPass ) || ($matchPass != 1) ){
+		$newPassCfrmErr= "Please check confirm Password not  matching.";
+	}else{
+			//$newP = md5($newPass);
+			//$updtPassQuery = "UPDATE user set user_pass = '{$newP}' WHERE set_token = '{}' ";
+		$sentemailResp="Hey, Your Password has been updated successfully!";
+	}
+}
+?>
 
 <div class="container">
 	<div class="row justify-content-center">
@@ -136,23 +166,24 @@ $url = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'http://' : 'https:/
 <!-- password reset -->
 		        <div class="form-group py-4 text-center">
 	              <div class="form-group">
-	                <input name="password" value="<?php echo $password;?>" class="form-control rounded-pill form-control-user py-2" placeholder="Enter your new Password" type="password" autocomplete="off" />
-	                <span class="error-msg"><?php echo (!empty($passErr))? $passErr : "";?></span>
+	                <input name="newPass" value="<?php echo $newPass;?>" class="form-control rounded-pill form-control-user py-2" placeholder="Enter your new Password" type="password" autocomplete="off" />
+	                <span class="error-msg"><?php echo (!empty($newPassErr))? $newPassErr : "";?></span>
 	              </div>
 	            </div>
 
 <!-- password reset -->
 	            <div class="form-group py-4 text-center">
 	              <div class="form-group">
-	                <input name="passwordconfirm" value="<?php echo $password;?>" class="form-control rounded-pill form-control-user py-2" placeholder="Confirm Password" type="password" autocomplete="off" />
-	                <span class="error-msg"><?php echo (!empty($passConfErr))? $passConfErr : "";?></span>
+	                <input name="newPassCfrm" value="<?php echo $newPassCfrm;?>" class="form-control rounded-pill form-control-user py-2" placeholder="Confirm Password" type="password" autocomplete="off" />
+	                <span class="error-msg"><?php echo (!empty($newPassCfrmErr))? $newPassCfrmErr : "";?></span>
 	              </div>
 	            </div>
 
 <!-- password reset -->
 
-		        <input type="submit" name="forgotPassSmt"class="btn w-100 rounded-pill btn-primary btn w-100 m-0 btn-hover color-3 py-2" value="Save Password" />
+		        <input type="submit" name="updateForgotPass"class="btn w-100 rounded-pill btn-primary btn w-100 m-0 btn-hover color-3 py-2" value="Save Password" />
 		      </form> 
+		      <span class="error-msg"><?php echo (!empty($newPassCommErr))? $newPassCommErr : "";?></span>                   
 		      <span class="sentResp"><?php echo (!empty($sentemailResp))? $sentemailResp : "";?></span>                   
 		    </div>        
 		  </div>
