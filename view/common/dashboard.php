@@ -8,7 +8,7 @@
   </div>
 </div>
 <div class="container profileform">
-  
+  <a class="btn btn-success" href="bannerImges.php">Banner Images</a>
 </div>
 
 
