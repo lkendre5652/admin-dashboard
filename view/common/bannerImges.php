@@ -63,6 +63,11 @@ function bannerInser($conn,$imguplink,$bannerTitle,$bannerCategory){
 ?>
 <div class="container">    
   <div class="d-flex align-items-center justify-content-center row">
+        <div class="p-2 m-2 bg-info text-white shadow rounded-2 col-md-7 text-center">      
+          <a href="<?php echo $imglink?>/emp-management/admin/view/common/dashboard.php" >Home</a>
+        </div>
+  </div>
+  <div class="d-flex align-items-center justify-content-center row">
       <div class="p-2 m-2 bg-info text-white shadow rounded-2 col-md-7 text-center">      
         <form method="post" action="" enctype="multipart/form-data" onsubmit="//insertBanner()" id="bannerForm">
           <div class="form-group">
