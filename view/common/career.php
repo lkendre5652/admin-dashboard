@@ -12,43 +12,32 @@
 </div>
 <?php 
 $imglink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER['HTTP_HOST'];
-
 $careerImageErr = "";
 $careerImageErr1 = "";
 $careerImageSucc = "";
-
 $careerTitleErr = "";
-
 $careerCategoryErr = "";
-
 $careerTitleSucc = '';
-
 $careerDescErr = "";
 
-
-if(isset($_REQUEST['submitBanner'])){    
-   $careerCatId = $_POST['careerCatId'];
-   $careerCategory = $_POST['careerCategory'];  
-   $careerTitle = $_POST['careerTitle'];  
-   $careerDesc = $_POST['careerDesc'];
-   $careerImage = $_FILES['careerImage'];
-
-  
-
+if(isset($_POST['submitBanner']) ){ 
+  $careerCatId = $_POST['careerCatId'];
+  $careerCategory = $_POST['careerCategory'];  
+  $careerTitle = $_POST['careerTitle'];  
+  $careerDesc = $_POST['careerDesc'];
+  $careerImage = $_FILES['careerImage'];  
   if( empty($careerImage)){
     $careerImageErr="This field should not be blank.";
   }else{   
     $target_dir = "../../uploads/products/";
     $target_path = $target_dir.basename( $_FILES['careerImage']['name']);
     $imguplink = $imglink."/emp-management/admin/uploads/products/".basename( $_FILES['careerImage']['name']);
-
     if(move_uploaded_file($_FILES['careerImage']['tmp_name'], $target_path)) {  
       $careerImageSucc = "File uploaded successfully!";  
     } else{  
       $careerImageErr1 = "Sorry, file not uploaded, please try again!";  
     } 
   }
-
 
   if( empty($careerTitle) ){
     $careerTitleErr="This field should not be blank.";
@@ -62,26 +51,9 @@ if(isset($_REQUEST['submitBanner'])){
     $careerDescErr="This field should not be blank.";
   }
 
-  if( (!empty($careerImage)) && (!empty($careerTitle)) && (!empty($careerCategory)) && (!empty($careerDesc))  ){ 
-  $careerCatIds = (!empty($careerCatId))? $careerCatId: '1';   
-    $comResp = careerInsertion($conn,$careerCatIds,$careerCategory,$careerTitle,$careerDesc,$imguplink);
-  }else{
-    $comErr = "Please check all fields.";
-  }
+}else{  
+  $comErr = "Please check all fields.";
 }
-function careerInsertion($conn,$careerCatIds,$careerCategory,$careerTitle,$careerDesc,$imguplink){
- 
-
-  //echo '$target_path','$bannerTitle','$bannerCategory';
-  $bnnerQuery = "INSERT INTO  career_list (career_name,career_description,career_img,cid) VALUES('$careerTitle','$careerDesc','$imguplink','$careerCatIds')";
-  $res= mysqli_query($conn,$bnnerQuery);
-  if($res){
-    return "Your Career has been saved successfully!!.";
-  }else{
-    return "Sorry, unable to save your Career please try after sometime.";
-  }
-}
-
 ?>
 <div class="container">  
  <div class="d-flex align-items-center justify-content-center row">
@@ -91,10 +63,10 @@ function careerInsertion($conn,$careerCatIds,$careerCategory,$careerTitle,$caree
   </div>  
   <div class="d-flex align-items-center justify-content-center row">
       <div class="p-2 m-2 bg-info text-white shadow rounded-2 col-md-10 text-center">      
-        <form method="post" action="" enctype="multipart/form-data" onsubmit="//insertBanner()" id="bannerForm">
+        <form method="post" action="" enctype="multipart/form-data"  id="bannerForm" name="bannerForm">
           <div class="form-group">
             <label for="careerImage">Career Image*</label> 
-            <input type="file" class="form-control" value="<?php echo $_FILES['careerImage']['name'];?>"name="careerImage" id="careerImage" autocomplete="off" >
+            <input type="file" class="form-control" name="careerImage" id="careerImage" autocomplete="off" >
             <?php 
             if( (!empty($careerImageSucc)) ){                
                 echo '<small id="bannerIMGErr" class="form-text text-muted success">"'.$careerImageSucc.'"</small>';  
@@ -109,12 +81,12 @@ function careerInsertion($conn,$careerCatIds,$careerCategory,$careerTitle,$caree
           </div>
           <div class="form-group">
             <label for="bannerTitle">Career Title*</label>
-            <input maxlength="100" type="text" class="form-control" id="careerTitle" name="careerTitle" value="<?php echo $_POST['careerTitle'];?>" autocomplete="off" placeholder="Career Title*" >
+            <input maxlength="100" type="text" class="form-control" id="careerTitle" name="careerTitle" value="<?php echo(!empty($careerTitle))? $careerTitle: "" ?>" autocomplete="off" placeholder="Career Title*" >
             <small id="bannerTtlErr" class="form-text text-muted"><?php echo (!empty($careerTitleErr))? $careerTitleErr : "";?></small>
           </div>
           <div class="form-group" style="display: none;">
             <label for="careerCatId">Career Category Id</label>
-            <input maxlength="100" type="text" class="form-control" id="careerCatId" name="careerCatId" value="<?php echo $_POST['careerCatId'];?>" autocomplete="off" placeholder="Career Category Id" >
+            <input maxlength="100" type="text" class="form-control" id="careerCatId" name="careerCatId" value="" autocomplete="off" placeholder="Career Category Id" >
             <small id="careerCatIdErr" class="form-text text-muted"><?php echo (!empty($careerCatIdErr))? $careerCatIdErr : "";?></small>
           </div>
           <div class="form-group">
@@ -135,7 +107,7 @@ function careerInsertion($conn,$careerCatIds,$careerCategory,$careerTitle,$caree
           </div>
           <div class="form-group">
             <label for="careerDesc">Career Description*</label>
-            <textarea class="form-control" name="careerDesc"id="careerDesc" rows="3" style="resize: none;" maxlength="250"><?php echo $_POST['careerDesc']; ?></textarea>
+            <textarea class="form-control" name="careerDesc"id="careerDesc" rows="3" style="resize: none;" maxlength="250"></textarea>
             <small id="careerDescErr" class="form-text text-muted"><?php echo (!empty($careerDescErr))? $careerDescErr : "";?></small>
           </div>                   
           <button type="submit" class="btn btn-primary mt-2" name="submitBanner" >Submit</button>
@@ -165,45 +137,94 @@ function careerInsertion($conn,$careerCatIds,$careerCategory,$careerTitle,$caree
   </div>
 </div>
 </div>
-<script>
-  $(document).ready(function(){
-    $.ajax({
-      url: 'https://development.ikf.in/emp-management/admin/API/getallcareersapi.php',
-      type: 'post',
-      dataType: 'JSON',
-      success: function(bannerdata){
-        console.log(bannerdata);
-        var outupt = '';
-        bannerdata.forEach( (items,index)=>{
-          outupt += `<tr>`;
-          outupt += `<td>${index}</td>`;
-          outupt += `<td><img src="${items.career_img}" alt="${items.career_name}" class="img-thumbnail"></td>`;
-          outupt += `<td>${items.cid}</td>`;
-          outupt += `<td>${items.cat_name}</td>`;
-          outupt += `<td>${items.clid}</td>`;                              
-          outupt += `<td>${items.career_name}</td>`;
-          outupt += `<td>${items.career_description}</td>`;
-          outupt += `<td><!-- <button class="btn btn-success">Edit</button> --><button onclick="removeCareer(${items.clid})" class="btn btn-warning">Delete</button></td>`;
-          outupt += `</tr>`;          
-        });
-        $("#bannerImage-body").html(outupt);
-      }
-    })
+<script> 
+    <?php 
+
+  
+    $target_dir = "../../uploads/products/";
+    $target_path = $target_dir.basename( $_FILES['careerImage']['name']);
+    $imguplink = $imglink."/emp-management/admin/uploads/products/".basename( $_FILES['careerImage']['name']);
+
+    if(move_uploaded_file($_FILES['careerImage']['tmp_name'], $target_path)) {  
+      $careerImageSucc = "File uploaded successfully!";  
+    } else{  
+      $careerImageErr1 = "Sorry, file not uploaded, please try again!";  
+    } 
+  
+
+
+
+  ?>
+
+$("#bannerForm").submit(function(e){
+  e.preventDefault();   
+
+
+  const careerTitle = $("#careerTitle").val();
+  const careerCatId = $("#careerCatId").val();
+  const bannerCategory = $("#bannerCategory").val();
+  const careerDesc = $("#careerDesc").val();
+  const fileUrl = "<?php echo $imguplink; ?>";  
+
+  const formData = {
+    "careerTitle" : careerTitle ,
+    "careerCatId" : careerCatId ,
+    "bannerCategory" : bannerCategory,
+    "careerDesc" : careerDesc,
+    "fileUrl" : fileUrl ,
+  }
+  console.log(formData);
+  $.ajax({
+    url: 'https://development.ikf.in/emp-management/admin/API/addcareerdata.php',
+    type: 'post',
+    data: formData,
+    dataType: 'JSON',
+    error:function(resp){
+      console.log(resp);
+    },
+    success:function(resp){
+      if(resp.status != "error" ){
+        console.log(resp)
+        getCareerList()
+      }else{
+        console.log(resp)
+        getCareerList()
+      }               
+    }      
+  }) 
+});
+
+function getCareerList(){
+  $.ajax({
+  url: 'https://development.ikf.in/emp-management/admin/API/getallcareersapi.php',
+  type: 'post',
+  dataType: 'JSON',
+  success: function(bannerdata){        
+    if(bannerdata.status === "Error"){
+      outupt += `<tr>`;
+      outupt += `<td colspan="8" >${bannerdata.msg}</td>`;
+      outupt += `</tr>`; 
+    }else{
+      var outupt = '';
+      bannerdata.forEach( (items,index)=>{
+        outupt += `<tr>`;
+        outupt += `<td>${index}</td>`;
+        outupt += `<td><img src="${items.career_img}" alt="${items.career_name}" class="img-thumbnail"></td>`;
+        outupt += `<td>${items.cid}</td>`;
+        outupt += `<td>${items.cat_name}</td>`;
+        outupt += `<td>${items.clid}</td>`;                              
+        outupt += `<td>${items.career_name}</td>`;
+        outupt += `<td>${items.career_description}</td>`;
+        outupt += `<td><!-- <button class="btn btn-success">Edit</button> --><button onclick="removeCareer(${items.clid})" class="btn btn-warning">Delete</button></td>`;
+        outupt += `</tr>`;          
+      });
+    }
+      $("#bannerImage-body").html(outupt);
+    }
   })
+}
 
-// function insertBanner(){
-//   event.preventDefault();
-//   var bannerForm = document.getElementById('bannerForm');
-//   const formData = new FormData(bannerForm);  
-//   console.log(formData);
-//   for(const [key,value] of formData){
-//     console.log(`${key} - ${value}`);
-
-//   }
-      
-// } 
 function removeCareer(cid){
-  alert(cid)
   $.ajax({
     url: 'https://development.ikf.in/emp-management/admin/API/deleteCareerApi.php',
     type: 'post',
@@ -211,16 +232,19 @@ function removeCareer(cid){
     dataType: 'JSON',
     success: function(resp){
       if(resp.status == "Error" ){
-        alert(resp.msg);
+        
         location.reload(true);
       }
       if(resp.status == "Success" ){
-        alert(resp.msg);
-        location.reload(true);
+        alert(resp.msg); 
+        getCareerList();
       }                      
     }
   });
 }
+
+
+getCareerList();
 
 $(document).ready(()=>{
   $("#bannerCategory").on("change",function(){
