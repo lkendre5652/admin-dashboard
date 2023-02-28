@@ -10,6 +10,7 @@
 <div class="container profileform">
   <a class="btn btn-success" href="bannerImges.php">Banner Images</a>
   <a class="btn btn-success" href="products.php">Products</a>
+  <a class="btn btn-success" href="career.php">Career</a>
 </div>
 
 

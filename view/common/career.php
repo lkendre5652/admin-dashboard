@@ -12,32 +12,25 @@
 </div>
 <?php 
 $imglink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER['HTTP_HOST'];
+
 $careerImageErr = "";
 $careerImageErr1 = "";
 $careerImageSucc = "";
+
 $careerTitleErr = "";
+
 $careerCategoryErr = "";
+
 $careerTitleSucc = '';
+
 $careerDescErr = "";
 
-if(isset($_POST['submitBanner']) ){ 
-  $careerCatId = $_POST['careerCatId'];
-  $careerCategory = $_POST['careerCategory'];  
-  $careerTitle = $_POST['careerTitle'];  
-  $careerDesc = $_POST['careerDesc'];
-  $careerImage = $_FILES['careerImage'];  
-  if( empty($careerImage)){
-    $careerImageErr="This field should not be blank.";
-  }else{   
-    $target_dir = "../../uploads/products/";
-    $target_path = $target_dir.basename( $_FILES['careerImage']['name']);
-    $imguplink = $imglink."/emp-management/admin/uploads/products/".basename( $_FILES['careerImage']['name']);
-    if(move_uploaded_file($_FILES['careerImage']['tmp_name'], $target_path)) {  
-      $careerImageSucc = "File uploaded successfully!";  
-    } else{  
-      $careerImageErr1 = "Sorry, file not uploaded, please try again!";  
-    } 
-  }
+if(isset($_POST['submitBanner1']) ){ 
+  
+   $careerCatId = $_POST['careerCatId'];
+   $careerCategory = $_POST['careerCategory'];  
+   $careerTitle = $_POST['careerTitle'];  
+   $careerDesc = $_POST['careerDesc'];
 
   if( empty($careerTitle) ){
     $careerTitleErr="This field should not be blank.";
@@ -57,6 +50,64 @@ if(isset($_POST['submitBanner']) ){
 ?>
 <div class="container">  
  <div class="d-flex align-items-center justify-content-center row">
+  <div class="p-2 m-2 bg-info text-white shadow rounded-2 col-md-10 text-center">      
+  
+    <form class="form-inline" method="post" id="careerCatForm" action="">
+      <label class="sr-only" for="careerCat">Name</label>
+      <input type="text" class="form-control mb-2 mr-sm-2" id="careerCat" name="careerCat" placeholder="Category Name">   
+      <button type="submit" name="careerCategory" class="btn btn-primary mb-2">Submit</button>
+    </form>
+    
+    <sub id="cmrsp"></sub>
+
+<script>
+  $(document).ready(function(){
+    $("#careerCatForm").submit( function(e){
+      e.preventDefault();
+      const careerCat = $("#careerCat").val();
+      const catFormData = new FormData();
+      catFormData.append('careerCat',careerCat);    
+      $.ajax({  
+        type: 'post',
+        url: 'https://development.ikf.in/emp-management/admin/API/careercatinsert.php',
+        data: catFormData,
+        dataType: 'JSON',
+        contentType:false,
+        cache:false,
+        processData:false,
+        beforeSubmit : function(){
+            $("#cmrsp").text("submiting..."); 
+        },
+
+        error: function(resp){
+          if( resp.status === "success" ){
+            $("#cmrsp").text(resp.msg);
+            window.location.reload(true)
+          }
+        },
+        success: function(resp){
+          if( resp.status === "success" ){
+            $("#cmrsp").text(resp.msg).attr('class','text-success');
+            window.location.reload(true)
+          }else{
+            $("#cmrsp").text(resp.msg).attr('class','text-warning');
+            window.location.reload(true)
+          }
+
+        }
+
+      });
+
+
+    });
+
+  });
+
+
+</script>
+
+
+  </div>
         <div class="p-2 m-2 bg-info text-white shadow rounded-2 col-md-10 text-center">      
           <a href="<?php echo $imglink?>/emp-management/admin/view/common/dashboard.php" >Home</a>
         </div>
@@ -137,61 +188,60 @@ if(isset($_POST['submitBanner']) ){
   </div>
 </div>
 </div>
+
 <script> 
-    <?php 
-
-  
-    $target_dir = "../../uploads/products/";
-    $target_path = $target_dir.basename( $_FILES['careerImage']['name']);
-    $imguplink = $imglink."/emp-management/admin/uploads/products/".basename( $_FILES['careerImage']['name']);
-
-    if(move_uploaded_file($_FILES['careerImage']['tmp_name'], $target_path)) {  
-      $careerImageSucc = "File uploaded successfully!";  
-    } else{  
-      $careerImageErr1 = "Sorry, file not uploaded, please try again!";  
-    } 
-  
-
-
-
-  ?>
-
 $("#bannerForm").submit(function(e){
-  e.preventDefault();   
 
-
+  e.preventDefault();     
+  var property = document.getElementById('careerImage').files[0];
+  var fileUrl = property.name;  
+  var image_extension = fileUrl.split('.').pop().toLowerCase();
+  if(jQuery.inArray(image_extension,['gif','jpg','jpeg','']) == -1){    
+    document.getElementById('careerImage').value="";
+  }
   const careerTitle = $("#careerTitle").val();
   const careerCatId = $("#careerCatId").val();
   const bannerCategory = $("#bannerCategory").val();
   const careerDesc = $("#careerDesc").val();
-  const fileUrl = "<?php echo $imguplink; ?>";  
 
-  const formData = {
-    "careerTitle" : careerTitle ,
-    "careerCatId" : careerCatId ,
-    "bannerCategory" : bannerCategory,
-    "careerDesc" : careerDesc,
-    "fileUrl" : fileUrl ,
+  if( careerTitle.length > 0 && careerCatId.length > 0 &&  bannerCategory.length > 0 && careerDesc.length > 0 ){
+    
+    var form_data = new FormData();
+    form_data.append("file",property);
+    form_data.append("careerTitle",careerTitle);
+    form_data.append("careerCatId",careerCatId);
+    form_data.append("bannerCategory",bannerCategory);
+    form_data.append("careerDesc",careerDesc);     
+    $.ajax({
+      url: 'https://development.ikf.in/emp-management/admin/API/addcareerdata.php',
+      type: 'post',
+      data: form_data,
+      dataType: 'JSON',
+      contentType:false,
+      cache:false,
+      processData:false,
+      error:function(resp){
+        console.log(resp);
+      },
+      success:function(resp){
+
+        console.log(resp);
+
+        if(resp.status !== "success" ){
+          $("#bannerCatErr").text(resp.msg);          
+          getCareerList()
+        }else{          
+          $("#bannerCatErr").text(resp.msg);            
+          getCareerList()
+        }               
+      }      
+    }) 
+
+    }else{
+    $("#bannerCatErr").text("Please check fields should not blank!! ");
   }
-  console.log(formData);
-  $.ajax({
-    url: 'https://development.ikf.in/emp-management/admin/API/addcareerdata.php',
-    type: 'post',
-    data: formData,
-    dataType: 'JSON',
-    error:function(resp){
-      console.log(resp);
-    },
-    success:function(resp){
-      if(resp.status != "error" ){
-        console.log(resp)
-        getCareerList()
-      }else{
-        console.log(resp)
-        getCareerList()
-      }               
-    }      
-  }) 
+
+
 });
 
 function getCareerList(){
